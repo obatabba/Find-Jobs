@@ -3,7 +3,14 @@ from rest_framework import serializers
 from .models import Company, Job
 
 
-class JobListSerializer(serializers.ModelSerializer):
+class BasicJobSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Job
+        fields = ['id', 'title']
+
+
+class SimpleJobSerializer(serializers.ModelSerializer):
     company = serializers.StringRelatedField()
 
     class Meta:
@@ -11,21 +18,34 @@ class JobListSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'company']
 
 
-class JobDetailSerializer(serializers.ModelSerializer):
+class JobSerializer(serializers.ModelSerializer):
     company = serializers.StringRelatedField()
+
+    def create(self, validated_data):
+        instance = Job.objects.create(
+            company_id=self.context['company_id'],
+            **validated_data
+        )
+        return instance
 
     class Meta:
         model = Job
         fields = ['id', 'company', 'title', 'description', 'work_days', 'work_hours', 'salary', 'payment_frequency', 'added', 'expire']
 
 
-class CompanyListSerializer(serializers.ModelSerializer):
+class JobEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = ['title', 'description', 'work_days', 'work_hours', 'salary', 'payment_frequency', 'expire']
+
+
+class SimpleCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = ['id', 'name']
 
 
-class CompanyDetailSerializer(serializers.ModelSerializer):
+class CompanySerializer(serializers.ModelSerializer):
     manager = serializers.StringRelatedField()
 
     class Meta:
