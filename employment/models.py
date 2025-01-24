@@ -75,7 +75,7 @@ class Job(models.Model):
     work_hours = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(24)]
     )
-    added = models.DateField(auto_now_add=True)
+    added = models.DateField(auto_now_add=True, null=True)
     expire = models.DateField(null=True, blank=True)
     salary = models.DecimalField(
         max_digits=8,
