@@ -1,5 +1,9 @@
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib import admin
+from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.forms import ModelMultipleChoiceField
+
+from admin_extend.extend import add_bidirectional_m2m, extend_registered, registered_form
 
 from .models import Address, Company, Employee, Employer, Job, User
 
@@ -39,6 +43,24 @@ class UserAdmin(BaseUserAdmin):
             elif obj.account_type == 'employer':
                 return [EmployerInline]
         return []
+    
+
+@admin.register(Employee)
+class EmployeeAdmin(admin.ModelAdmin):
+    model = Employee
+
+
+@extend_registered
+class ExtendedSiteAdminForm(add_bidirectional_m2m(registered_form(Employee))):
+
+    applied_jobs = ModelMultipleChoiceField(
+        queryset=Job.objects.all(),
+        widget=FilteredSelectMultiple('Jobs', False)
+    )
+
+    def _get_bidirectional_m2m_fields(self):
+        return super(ExtendedSiteAdminForm, self).\
+            _get_bidirectional_m2m_fields() + [('applied_jobs', 'applied_jobs')]
 
 
 @admin.register(Job)
