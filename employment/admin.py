@@ -3,11 +3,10 @@ from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.db.models import Count
 from django.forms import ModelMultipleChoiceField
-from django.urls import reverse
-from django.utils.html import format_html
+from django.utils.timezone import localdate
 
 from admin_extend.extend import add_bidirectional_m2m, extend_registered, registered_form
-from .models import Address, Company, Employee, Employer, Job, User
+from .models import Company, Employee, Employer, Job, User
 
 
 class CompanyInline(admin.TabularInline):
@@ -66,6 +65,7 @@ class EmployerAdmin(admin.ModelAdmin):
     list_display = ['user__first_name', 'user__last_name', 'companies_count']
     list_per_page = 20
     ordering = ['user__first_name', 'user__last_name']
+    search_fields = ['user__first_name', 'user__last_name']
 
     def get_queryset(self, request):
         return super().get_queryset(request) \
@@ -82,6 +82,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_display = ['user__first_name', 'user__last_name']
     list_per_page = 20
     ordering = ['user__first_name', 'user__last_name']
+    search_fields = ['user__first_name', 'user__last_name']
 
 
 @extend_registered
@@ -97,13 +98,31 @@ class ExtendedSiteAdminForm(add_bidirectional_m2m(registered_form(Employee))):
             _get_bidirectional_m2m_fields() + [('applied_jobs', 'applied_jobs')]
 
 
+class JobFilter(admin.SimpleListFilter):
+    title = 'status'
+    parameter_name = 'expire'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('<now', 'expired'),
+            ('>now', 'available')
+        ]
+    
+    def queryset(self, request, queryset):
+        if self.value() == '<now':
+            return queryset.filter(expire__lt=localdate())
+        if self.value() == '>now':
+            return queryset.filter(expire__gte=localdate())
+
+
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
     autocomplete_fields = ['company']
     search_fields = ['title']
-    list_display = ['title', 'company', 'salary']
+    list_display = ['title', 'company', 'salary', 'expire']
     list_per_page = 20
     ordering = ['added']
+    list_filter = [JobFilter]
 
 
 @admin.register(Company)
