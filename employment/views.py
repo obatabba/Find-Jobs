@@ -1,7 +1,10 @@
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.response import Response
 
-from .models import Company, Job
+from .models import Company, Employee, Job
 from .serializers import CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer
 
 
@@ -14,6 +17,16 @@ class JobViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
         if self.action == 'detail':
             return JobSerializer
         return JobSerializer
+    
+    @action(detail=True)
+    def apply(self, request, pk):
+        employee = Employee.objects.get(user_id=request.user.id)
+        job = get_object_or_404(Job, pk=pk)
+        if job in employee.applied_jobs.all():
+            return Response('Already applied.')
+        job.applicants.add(employee)
+        job.save()
+        return Response()
 
 
 class CompanyViewSet(ModelViewSet):
