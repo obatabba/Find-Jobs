@@ -85,6 +85,7 @@ class Job(models.Model):
         validators=[MinValueValidator(Decimal(1))]
     )
     payment_frequency = models.CharField(max_length=1, choices=PAYMENT_FREQUENCY_CHOICES,default='M')
+    applicants = models.ManyToManyField(Employee, blank=True, related_name='applied_jobs')
 
     def __str__(self):
         return self.title
