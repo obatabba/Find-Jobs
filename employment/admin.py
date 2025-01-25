@@ -1,19 +1,33 @@
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.db.models import Count
 from django.forms import ModelMultipleChoiceField
+from django.urls import reverse
+from django.utils.html import format_html
 
 from admin_extend.extend import add_bidirectional_m2m, extend_registered, registered_form
-
 from .models import Address, Company, Employee, Employer, Job, User
+
+
+class CompanyInline(admin.TabularInline):
+    model = Company
+    extra = 0
 
 
 class EmployerInline(admin.StackedInline):
     model = Employer
+    show_change_link = True
 
 
 class EmployeeInline(admin.StackedInline):
     model = Employee
+
+
+class JobInline(admin.StackedInline):
+    model = Job
+    extra = 0
+    exclude = ['applicants']
 
 
 @admin.register(User)
@@ -43,11 +57,31 @@ class UserAdmin(BaseUserAdmin):
             elif obj.account_type == 'employer':
                 return [EmployerInline]
         return []
-    
+
+
+@admin.register(Employer)
+class EmployerAdmin(admin.ModelAdmin):
+    model = Employer
+    inlines = [CompanyInline]
+    list_display = ['user__first_name', 'user__last_name', 'companies_count']
+    list_per_page = 20
+    ordering = ['user__first_name', 'user__last_name']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request) \
+            .annotate(companies_count=Count('companies'))
+
+    @admin.display(ordering='companies_count')
+    def companies_count(self, employer):
+        return employer.companies_count
+
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     model = Employee
+    list_display = ['user__first_name', 'user__last_name']
+    list_per_page = 20
+    ordering = ['user__first_name', 'user__last_name']
 
 
 @extend_registered
@@ -74,6 +108,17 @@ class JobAdmin(admin.ModelAdmin):
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    search_fields = ['name']
+    search_fields = ['name', 'manager']
+    inlines = [JobInline]
+    list_display = ['name', 'manager', 'jobs_count']
     list_per_page = 20
     ordering = ['name']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request) \
+            .annotate(jobs_count=Count('jobs'))
+
+    @admin.display(ordering='jobs_count')
+    def jobs_count(self, company):
+        return company.jobs_count
+    
