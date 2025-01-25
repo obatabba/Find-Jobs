@@ -90,7 +90,8 @@ class ExtendedSiteAdminForm(add_bidirectional_m2m(registered_form(Employee))):
 
     applied_jobs = ModelMultipleChoiceField(
         queryset=Job.objects.all(),
-        widget=FilteredSelectMultiple('Jobs', False)
+        widget=FilteredSelectMultiple('Jobs', False),
+        required=False
     )
 
     def _get_bidirectional_m2m_fields(self):
@@ -140,4 +141,3 @@ class CompanyAdmin(admin.ModelAdmin):
     @admin.display(ordering='jobs_count')
     def jobs_count(self, company):
         return company.jobs_count
-    
