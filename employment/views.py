@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Company, Employee, Job
-from .serializers import CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
+from .serializers import CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, ApplicantSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -77,3 +77,10 @@ class NestedJobViewSet(ModelViewSet):
     
     def get_serializer_context(self):
         return {'company_id': self.kwargs['company_pk']}
+    
+
+class ApplicantsViewSet(ReadOnlyModelViewSet):
+    serializer_class = ApplicantSerializer
+
+    def get_queryset(self):
+        return Employee.objects.filter(applied_jobs__id=self.kwargs['job_pk'])

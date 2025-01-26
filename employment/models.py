@@ -47,6 +47,9 @@ class Employee(models.Model):
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
+    
+    def email(self):
+        return self.user.email
 
 
 class Company(models.Model):

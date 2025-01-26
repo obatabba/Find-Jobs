@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Company, Job
+from .models import Company, Employee, Job
 
 
 class BasicJobSerializer(serializers.ModelSerializer):
@@ -70,6 +70,15 @@ class CompanyEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = ['name', 'info']
+
+
+class ApplicantSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    address = serializers.StringRelatedField()
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'user', 'about', 'phone', 'email', 'address', 'birth_date']
 
 
 class EmptySerializer(serializers.Serializer):
