@@ -1,32 +1,34 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
+from rest_framework import status
 
 from .models import Company, Employee, Job
-from .serializers import CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer
+from .serializers import CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
 
 
-class JobViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+class JobViewSet(ReadOnlyModelViewSet):
     queryset = Job.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'list':
             return SimpleJobSerializer
-        if self.action == 'detail':
+        if self.action == 'retrieve':
             return JobSerializer
         return JobSerializer
     
-    @action(detail=True)
+    @action(detail=True, methods=['post'])
     def apply(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
         job = get_object_or_404(Job, pk=pk)
         if job in employee.applied_jobs.all():
-            return Response('Already applied.')
+            return Response(
+                {"error":"You have already applied to this job."}, status=status.HTTP_400_BAD_REQUEST)
+
         job.applicants.add(employee)
-        job.save()
-        return Response()
+        return Response({"success": "You have successfullt applied to this job"})
 
 
 class CompanyViewSet(ModelViewSet):
@@ -40,7 +42,7 @@ class CompanyViewSet(ModelViewSet):
               
         if self.action == 'list':
             return SimpleCompanySerializer
-        if self.action == 'detail':
+        if self.action == 'retrieve':
             return CompanySerializer
         return CompanySerializer
     
@@ -58,7 +60,7 @@ class NestedJobViewSet(ModelViewSet):
             return JobEditSerializer
         if self.action == 'list':
             return BasicJobSerializer
-        if self.action == 'detail':
+        if self.action == 'retrieve':
             return JobSerializer
         return JobSerializer
     
