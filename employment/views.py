@@ -17,18 +17,29 @@ class JobViewSet(ReadOnlyModelViewSet):
             return SimpleJobSerializer
         if self.action == 'retrieve':
             return JobSerializer
-        return JobSerializer
+        return EmptySerializer
     
     @action(detail=True, methods=['post'])
     def apply(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
         job = get_object_or_404(Job, pk=pk)
-        if job in employee.applied_jobs.all():
+        if employee.applied_jobs.filter(id=job.id).exists():
             return Response(
                 {"error":"You have already applied to this job."}, status=status.HTTP_400_BAD_REQUEST)
 
         job.applicants.add(employee)
-        return Response({"success": "You have successfullt applied to this job"})
+        return Response({"success": "You have successfully applied to this job."})
+    
+    @action(detail=True, methods=['post'])
+    def cancel_application(self, request, pk):
+        employee = Employee.objects.get(user_id=request.user.id)
+        job = get_object_or_404(Job, pk=pk)
+        if employee.applied_jobs.filter(id=job.id).exists():
+            job.applicants.remove(employee)
+            return Response(
+                {"success": "Your application has been canceled successfully."})
+
+        return Response({"error": "You have not applied to this job."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CompanyViewSet(ModelViewSet):

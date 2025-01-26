@@ -70,3 +70,7 @@ class CompanyEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = ['name', 'info']
+
+
+class EmptySerializer(serializers.Serializer):
+    pass
