@@ -36,22 +36,6 @@ class Employer(models.Model):
         return f'{self.user.first_name} {self.user.last_name}'
 
 
-class Employee(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    about = models.TextField(null=True, blank=True)
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
-    joined_in = models.DateField(auto_now_add=True)
-    # resume = models.FileField(upload_to='employment/resumes', null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.user.first_name} {self.user.last_name}'
-    
-    def email(self):
-        return self.user.email
-
-
 class Company(models.Model):
     manager = models.ForeignKey(Employer, on_delete=models.CASCADE, related_name='companies')
     name = models.CharField(max_length=255, unique=True)
@@ -59,7 +43,7 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 
 class Job(models.Model):
     PAYMENT_FREQUENCY_CHOICES = {
@@ -88,13 +72,30 @@ class Job(models.Model):
         validators=[MinValueValidator(Decimal(1))]
     )
     payment_frequency = models.CharField(max_length=1, choices=PAYMENT_FREQUENCY_CHOICES,default='M')
-    applicants = models.ManyToManyField(Employee, blank=True, related_name='applied_jobs')
 
     def __str__(self):
         return self.title
 
-# CURRENCY_CHOICES = {
-#     'USD': 'US Dollar',
-#     'EUR': 'Euro',
-#     'SYP': 'Syrian pound'
-# }
+
+class Employee(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    about = models.TextField(null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    joined_in = models.DateField(auto_now_add=True)
+    applied_jobs = models.ManyToManyField(Job, through='Application', blank=True, related_name='applicants')
+    # resume = models.FileField(upload_to='employment/resumes', null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.user.first_name} {self.user.last_name}'
+    
+    def email(self):
+        return self.user.email
+
+
+class Application(models.Model):
+    applicant = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    request_text = models.TextField()
+    applied_at = models.DateTimeField(auto_now_add=True)
