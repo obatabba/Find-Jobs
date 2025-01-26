@@ -99,3 +99,8 @@ class Application(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     request_text = models.TextField()
     applied_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['applicant', 'job'], name='unique-application')
+        ]
