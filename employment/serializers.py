@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Company, Employee, Job
+from .models import Application, Company, Employee, Job
 
 
 class BasicJobSerializer(serializers.ModelSerializer):
@@ -72,13 +72,28 @@ class CompanyEditSerializer(serializers.ModelSerializer):
         fields = ['name', 'info']
 
 
-class ApplicantSerializer(serializers.ModelSerializer):
+class EmployeeSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     address = serializers.StringRelatedField()
 
     class Meta:
         model = Employee
         fields = ['id', 'user', 'about', 'phone', 'email', 'address', 'birth_date']
+
+
+class ApplicationSerializer(serializers.ModelSerializer):
+    
+    def create(self, validated_data):
+        instance = Application.objects.create(
+            applicant_id=self.context['applicant_id'],
+            job_id=self.context['job_id'],
+            **validated_data
+        )
+        return instance
+        
+    class Meta:
+        model = Application
+        fields = ['request_text']
 
 
 class EmptySerializer(serializers.Serializer):

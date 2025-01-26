@@ -5,8 +5,8 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Company, Employee, Job
-from .serializers import CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, ApplicantSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
+from .models import Application, Company, Employee, Job
+from .serializers import ApplicationSerializer, CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, EmployeeSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -17,24 +17,37 @@ class JobViewSet(ReadOnlyModelViewSet):
             return SimpleJobSerializer
         if self.action == 'retrieve':
             return JobSerializer
+        if self.action == 'apply':
+            return ApplicationSerializer
         return EmptySerializer
+    
+    def get_serializer_context(self):
+        if self.action == 'apply':
+            return {
+                'applicant_id': self.request.user.employee.id,
+                'job_id': self.kwargs['pk']
+                }
+        return super().get_serializer_context()
     
     @action(detail=True, methods=['post'])
     def apply(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
         job = get_object_or_404(Job, pk=pk)
-        if employee.applied_jobs.filter(id=job.id).exists():
+
+        if Application.objects.filter(applicant=employee, job=job).exists():
             return Response(
                 {"error":"You have already applied to this job."}, status=status.HTTP_400_BAD_REQUEST)
 
-        job.applicants.add(employee)
+        serializer = ApplicationSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response({"success": "You have successfully applied to this job."})
     
     @action(detail=True, methods=['post'])
     def cancel_application(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
         job = get_object_or_404(Job, pk=pk)
-        if employee.applied_jobs.filter(id=job.id).exists():
+        if Application.objects.filter(applicant=employee, job=job).exists():
             job.applicants.remove(employee)
             return Response(
                 {"success": "Your application has been canceled successfully."})
@@ -80,7 +93,7 @@ class NestedJobViewSet(ModelViewSet):
     
 
 class ApplicantsViewSet(ReadOnlyModelViewSet):
-    serializer_class = ApplicantSerializer
+    serializer_class = EmployeeSerializer
 
     def get_queryset(self):
         return Employee.objects.filter(applied_jobs__id=self.kwargs['job_pk'])
