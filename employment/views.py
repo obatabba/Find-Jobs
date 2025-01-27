@@ -1,12 +1,11 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Application, Company, Employee, Job
-from .serializers import ApplicationSerializer, CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, EmployeeSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
+from .serializers import ApplicationSerializer, ApplicationCreateSerializer, CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, SimpleApplicationSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -18,7 +17,7 @@ class JobViewSet(ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return JobSerializer
         if self.action == 'apply':
-            return ApplicationSerializer
+            return ApplicationCreateSerializer
         return EmptySerializer
     
     def get_serializer_context(self):
@@ -26,7 +25,7 @@ class JobViewSet(ReadOnlyModelViewSet):
             return {
                 'applicant_id': self.request.user.employee.id,
                 'job_id': self.kwargs['pk']
-                }
+            }
         return super().get_serializer_context()
     
     @action(detail=True, methods=['post'])
@@ -38,7 +37,7 @@ class JobViewSet(ReadOnlyModelViewSet):
             return Response(
                 {"error":"You have already applied to this job."}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = ApplicationSerializer(data=request.data, context=self.get_serializer_context())
+        serializer = ApplicationCreateSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"success": "You have successfully applied to this job."})
@@ -93,7 +92,11 @@ class NestedJobViewSet(ModelViewSet):
     
 
 class ApplicantsViewSet(ReadOnlyModelViewSet):
-    serializer_class = EmployeeSerializer
 
     def get_queryset(self):
-        return Employee.objects.filter(applied_jobs__id=self.kwargs['job_pk'])
+        return Application.objects.filter(job_id=self.kwargs['job_pk'])
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return ApplicationSerializer
+        return SimpleApplicationSerializer

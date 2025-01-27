@@ -72,16 +72,41 @@ class CompanyEditSerializer(serializers.ModelSerializer):
         fields = ['name', 'info']
 
 
+class SimpleEmployeeSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    address = serializers.StringRelatedField()
+
+    class Meta:
+        model = Employee
+        fields = ['user', 'address']
+
+
 class EmployeeSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     address = serializers.StringRelatedField()
 
     class Meta:
         model = Employee
-        fields = ['id', 'user', 'about', 'phone', 'email', 'address', 'birth_date']
+        fields = ['user', 'about', 'email', 'phone', 'address']
+
+
+class SimpleApplicationSerializer(serializers.ModelSerializer):
+    applicant = SimpleEmployeeSerializer()
+
+    class Meta:
+        model = Application
+        fields = ['id', 'applicant']
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
+    applicant = EmployeeSerializer()
+
+    class Meta:
+        model = Application
+        fields = ['id', 'applicant', 'request_text', 'applied_at']
+
+
+class ApplicationCreateSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         instance = Application.objects.create(
