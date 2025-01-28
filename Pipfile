@@ -9,6 +9,8 @@ djangorestframework = "*"
 drf-nested-routers = "*"
 python-magic = "*"
 python-magic-bin = "*"
+djoser = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
