@@ -103,7 +103,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Application
-        fields = ['id', 'applicant', 'request_text', 'applied_at']
+        fields = ['id', 'applicant', 'request_text', 'resume', 'applied_at']
 
 
 class ApplicationCreateSerializer(serializers.ModelSerializer):
@@ -118,7 +118,7 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Application
-        fields = ['request_text']
+        fields = ['request_text', 'resume']
 
 
 class EmptySerializer(serializers.Serializer):

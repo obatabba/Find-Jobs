@@ -7,6 +7,8 @@ name = "pypi"
 django = "*"
 djangorestframework = "*"
 drf-nested-routers = "*"
+python-magic = "*"
+python-magic-bin = "*"
 
 [dev-packages]
 

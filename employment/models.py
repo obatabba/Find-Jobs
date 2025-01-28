@@ -1,8 +1,10 @@
 from decimal import Decimal
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+from .validators import validate_file_content, validate_file_size
 
 
 class User(AbstractUser):
@@ -98,6 +100,10 @@ class Application(models.Model):
     applicant = models.ForeignKey(Employee, on_delete=models.CASCADE)
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     request_text = models.TextField()
+    resume = models.FileField(
+        upload_to='employment/resumes',
+        validators=[validate_file_size, validate_file_content]
+    )
     applied_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

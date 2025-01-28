@@ -46,8 +46,9 @@ class JobViewSet(ReadOnlyModelViewSet):
     def cancel_application(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
         job = get_object_or_404(Job, pk=pk)
-        if Application.objects.filter(applicant=employee, job=job).exists():
-            job.applicants.remove(employee)
+        application = Application.objects.filter(applicant=employee, job=job)
+        if application.exists():
+            application.delete()
             return Response(
                 {"success": "Your application has been canceled successfully."})
 
