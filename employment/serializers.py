@@ -1,6 +1,19 @@
+from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer, UserSerializer as BaseUserSerializer
 from rest_framework import serializers
 
-from .models import Application, Company, Employee, Job
+from .models import Application, Company, Employee, Job, User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    account_type = serializers.CharField(read_only=True)
+
+    class Meta(BaseUserSerializer.Meta):
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'account_type']
+
+
+class UserCreateSerializer(BaseUserCreateSerializer):
+    class Meta(BaseUserCreateSerializer.Meta):
+        fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name', 'account_type']
 
 
 class BasicJobSerializer(serializers.ModelSerializer):
