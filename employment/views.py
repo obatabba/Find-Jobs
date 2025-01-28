@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Application, Company, Employee, Job
-from .serializers import ApplicationSerializer, ApplicationCreateSerializer, CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, SimpleApplicationSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
+from .serializers import ApplicationSerializer, ApplicationCreateSerializer, CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, EmployeeSerializer, SimpleApplicationSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -101,3 +101,8 @@ class ApplicantsViewSet(ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return ApplicationSerializer
         return SimpleApplicationSerializer
+
+
+class EmployeeViewSet(ReadOnlyModelViewSet):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer

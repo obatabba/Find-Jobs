@@ -6,6 +6,7 @@ from .import views
 router = DefaultRouter()
 router.register('jobs', views.JobViewSet)
 router.register('companies', views.CompanyViewSet)
+router.register('employees', views.EmployeeViewSet)
 
 companies_router = NestedDefaultRouter(router, 'companies', lookup='company')
 companies_router.register('jobs', views.NestedJobViewSet, basename='company-jobs')
