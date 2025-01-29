@@ -1,10 +1,16 @@
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer, UserSerializer as BaseUserSerializer
 from rest_framework import serializers
 
-from .models import Application, Company, Employee, Job, User
+from .models import Application, Company, Employee, Job, Address
 
 
-class UserSerializer(serializers.ModelSerializer):
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ['country', 'city', 'street']
+
+
+class UserSerializer(BaseUserSerializer):
     account_type = serializers.CharField(read_only=True)
 
     class Meta(BaseUserSerializer.Meta):
@@ -14,6 +20,29 @@ class UserSerializer(serializers.ModelSerializer):
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
         fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name', 'account_type']
+
+
+class EmployeeUserSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.EmailField(source='user.email')
+    address = AddressSerializer()
+
+    class Meta:
+        model = Employee
+        fields = ['first_name', 'last_name', 'email', 'expertise', 'about', 'phone', 'birth_date', 'address']
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        user_serializer = UserSerializer(instance.user, data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user_serializer.save()
+
+        address_data = validated_data.pop('address', {})
+        address_serializer = AddressSerializer(instance.address, data=address_data)
+        address_serializer.is_valid(raise_exception=True)
+        address_serializer.save()
+        return super().update(instance, validated_data)
 
 
 class BasicJobSerializer(serializers.ModelSerializer):

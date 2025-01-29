@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Application, Company, Employee, Job
-from .serializers import ApplicationSerializer, ApplicationCreateSerializer, CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, EmployeeSerializer, PublicEmployeeSerializer, PublicSimpleEmployeeSerializer, SimpleApplicationSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleEmployeeSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
+from .serializers import ApplicationSerializer, ApplicationCreateSerializer, CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, EmployeeSerializer, EmployeeUserSerializer, PublicEmployeeSerializer, PublicSimpleEmployeeSerializer, SimpleApplicationSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleEmployeeSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -109,4 +109,18 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return PublicSimpleEmployeeSerializer
+        if self.action == 'me':
+            return EmployeeUserSerializer
         return PublicEmployeeSerializer
+    
+    @action(detail=False, methods=['get', 'put', 'patch'])
+    def me(self, request):
+        employee_profile = get_object_or_404(Employee, user_id=request.user.id)
+        if request.method == 'GET':
+            serializer = EmployeeUserSerializer(employee_profile)
+            return Response(serializer.data)
+        if request.method in ['PUT', 'PATCH']:
+            serializer = EmployeeUserSerializer(employee_profile, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
