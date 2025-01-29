@@ -85,13 +85,29 @@ class CompanyEditSerializer(serializers.ModelSerializer):
         fields = ['name', 'info']
 
 
+class PublicSimpleEmployeeSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'user', 'expertise']
+
+
+class PublicEmployeeSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Employee
+        fields = ['user', 'expertise', 'about']
+
+
 class SimpleEmployeeSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     address = serializers.StringRelatedField()
 
     class Meta:
         model = Employee
-        fields = ['user', 'address']
+        fields = ['id', 'user', 'expertise', 'address']
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -100,7 +116,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['user', 'about', 'email', 'phone', 'address']
+        fields = ['user', 'expertise', 'about', 'email', 'phone', 'address']
 
 
 class SimpleApplicationSerializer(serializers.ModelSerializer):
