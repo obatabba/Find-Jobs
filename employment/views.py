@@ -1,11 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework import status
 
 from .models import Application, Company, Employee, Job
-from .serializers import ApplicationSerializer, ApplicationCreateSerializer, CompanyCreateSerializer, CompanySerializer, CompanyEditSerializer, EmployeeSerializer, EmployeeUserSerializer, PublicEmployeeSerializer, PublicSimpleEmployeeSerializer, SimpleApplicationSerializer, JobEditSerializer, SimpleCompanySerializer, BasicJobSerializer, SimpleEmployeeSerializer, SimpleJobSerializer, JobSerializer, EmptySerializer
+from .serializers import *
+from .permissions import IsEmployee
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -105,6 +107,7 @@ class ApplicantsViewSet(ReadOnlyModelViewSet):
 
 class EmployeeViewSet(ReadOnlyModelViewSet):
     queryset = Employee.objects.all()
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -113,7 +116,7 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
             return EmployeeUserSerializer
         return PublicEmployeeSerializer
     
-    @action(detail=False, methods=['get', 'put', 'patch'])
+    @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsEmployee])
     def me(self, request):
         employee_profile = get_object_or_404(Employee, user_id=request.user.id)
         if request.method == 'GET':

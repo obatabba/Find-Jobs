@@ -39,9 +39,12 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         user_serializer.save()
 
         address_data = validated_data.pop('address', {})
-        address_serializer = AddressSerializer(instance.address, data=address_data)
+        if not instance.address:
+            address_serializer = AddressSerializer(data=address_data)
+        else:
+            address_serializer = AddressSerializer(instance.address, data=address_data)
         address_serializer.is_valid(raise_exception=True)
-        address_serializer.save()
+        instance.address = address_serializer.save()
         return super().update(instance, validated_data)
 
 
