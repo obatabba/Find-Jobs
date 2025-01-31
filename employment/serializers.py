@@ -1,7 +1,7 @@
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer, UserSerializer as BaseUserSerializer
 from rest_framework import serializers
 
-from .models import Application, Company, Employee, Job, Address
+from .models import Application, Company, Employee, Employer, Job, Address
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -184,3 +184,22 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
 
 class EmptySerializer(serializers.Serializer):
     pass
+
+
+class SimpleEmployerSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    
+    class Meta:
+        model = Employer
+        fields = ['id', 'user']
+
+
+class EmployerSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.EmailField(source='user.email')
+    companies = SimpleCompanySerializer(many=True)
+
+    class Meta:
+        model = Employer
+        fields = ['first_name', 'last_name','about', 'email',  'phone', 'companies']

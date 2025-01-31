@@ -127,3 +127,12 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+
+class EmployerViewSet(ModelViewSet):
+    queryset = Employer.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return EmployerSerializer
+        return SimpleEmployerSerializer
