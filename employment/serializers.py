@@ -203,9 +203,9 @@ class EmployerSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
-        user_serializer = UserSerializer(instance.user, data=user_data)
-        user_serializer.is_valid(raise_exception=True)
-        user_serializer.save()
+        for attr, value in user_data.items():
+            setattr(instance.user, attr, value)
+        instance.user.save()
 
         return super().update(instance, validated_data)
 
