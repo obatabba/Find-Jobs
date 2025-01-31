@@ -195,10 +195,18 @@ class SimpleEmployerSerializer(serializers.ModelSerializer):
 
 
 class EmployerSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(source='user.first_name')
-    last_name = serializers.CharField(source='user.last_name')
-    email = serializers.EmailField(source='user.email')
-    companies = SimpleCompanySerializer(many=True)
+    first_name = serializers.CharField(source='user.first_name', required=False)
+    last_name = serializers.CharField(source='user.last_name', required=False)
+    email = serializers.EmailField(source='user.email', required=False)
+    companies = SimpleCompanySerializer(many=True, read_only=True)
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        user_serializer = UserSerializer(instance.user, data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user_serializer.save()
+
+        return super().update(instance, validated_data)
 
     class Meta:
         model = Employer

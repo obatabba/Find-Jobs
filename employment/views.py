@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework import status
 
 from .models import Application, Company, Employee, Job
 from .serializers import *
-from .permissions import IsEmployee
+from .permissions import IsEmployee, IsEmployer
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -129,10 +129,25 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
             return Response(serializer.data)
 
 
-class EmployerViewSet(ModelViewSet):
+class EmployerViewSet(ReadOnlyModelViewSet):
     queryset = Employer.objects.all()
+    permission_classes = [IsAdminUser]
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return EmployerSerializer
+        if self.action == 'me':
+            return EmployerSerializer
         return SimpleEmployerSerializer
+
+    @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsAuthenticated, IsEmployer])
+    def me(self, request):
+        employer_profile = get_object_or_404(Employer, user_id=request.user.id)
+        if request.method == 'GET':
+            serializer = EmployerSerializer(employer_profile)
+            return Response(serializer.data)
+        if request.method in ['PUT', 'PATCH']:
+            serializer = EmployerSerializer(employer_profile, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
