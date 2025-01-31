@@ -113,17 +113,17 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
         if self.action == 'list':
             return PublicSimpleEmployeeSerializer
         if self.action == 'me':
-            return EmployeeUserSerializer
+            return EmployeeEditSerializer
         return PublicEmployeeSerializer
     
-    @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsEmployee])
+    @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsAuthenticated, IsEmployee])
     def me(self, request):
         employee_profile = get_object_or_404(Employee, user_id=request.user.id)
         if request.method == 'GET':
-            serializer = EmployeeUserSerializer(employee_profile)
+            serializer = EmployeeEditSerializer(employee_profile)
             return Response(serializer.data)
         if request.method in ['PUT', 'PATCH']:
-            serializer = EmployeeUserSerializer(employee_profile, data=request.data)
+            serializer = EmployeeEditSerializer(employee_profile, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
