@@ -4,13 +4,13 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 class IsEmployee(BasePermission):
 
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_employee)
+        return getattr(request.user, 'is_employee', False)
 
 
 class IsEmployer(BasePermission):
 
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_employer)
+        return getattr(request.user, 'is_employer', False)
     
 
 class IsEmployerOrReadOnly(BasePermission):

@@ -120,7 +120,7 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
             return EmployeeEditSerializer
         return PublicEmployeeSerializer
 
-    @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsAuthenticated, IsEmployee])
+    @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsEmployee])
     def me(self, request):
         employee_profile = get_object_or_404(Employee, user_id=request.user.id)
         if request.method == 'GET':
@@ -144,7 +144,7 @@ class EmployerViewSet(ReadOnlyModelViewSet):
             return EmployerSerializer
         return SimpleEmployerSerializer
 
-    @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsAuthenticated, IsEmployer])
+    @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsEmployer])
     def me(self, request):
         employer_profile = get_object_or_404(Employer, user_id=request.user.id)
         if request.method == 'GET':
