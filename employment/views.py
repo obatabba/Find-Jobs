@@ -23,14 +23,15 @@ class JobViewSet(ReadOnlyModelViewSet):
         return EmptySerializer
     
     def get_serializer_context(self):
+        context = super().get_serializer_context()
         if self.action == 'apply':
-            return {
+            context.update({
                 'applicant_id': self.request.user.employee.id,
                 'job_id': self.kwargs['pk']
-            }
-        return super().get_serializer_context()
+            })
+        return context 
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsEmployee])
     def apply(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
         job = get_object_or_404(Job, pk=pk)
@@ -44,7 +45,7 @@ class JobViewSet(ReadOnlyModelViewSet):
         serializer.save()
         return Response({"success": "You have successfully applied to this job."})
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsEmployee])
     def cancel_application(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
         job = get_object_or_404(Job, pk=pk)
