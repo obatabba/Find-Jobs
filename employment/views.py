@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework import status
 
 from .models import Application, Company, Employee, Job
 from .serializers import *
-from .permissions import IsEmployee, IsEmployer
+from .permissions import IsCompanyManager, IsEmployee, IsEmployer, IsEmployerOrReadOnly
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -29,7 +29,7 @@ class JobViewSet(ReadOnlyModelViewSet):
                 'job_id': self.kwargs['pk']
             }
         return super().get_serializer_context()
-    
+
     @action(detail=True, methods=['post'])
     def apply(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
@@ -43,7 +43,7 @@ class JobViewSet(ReadOnlyModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"success": "You have successfully applied to this job."})
-    
+
     @action(detail=True, methods=['post'])
     def cancel_application(self, request, pk):
         employee = Employee.objects.get(user_id=request.user.id)
@@ -59,21 +59,25 @@ class JobViewSet(ReadOnlyModelViewSet):
 
 class CompanyViewSet(ModelViewSet):
     queryset = Company.objects.all()
+    permission_classes = [IsEmployerOrReadOnly, IsCompanyManager]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CompanyCreateSerializer
         if self.request.method in ['PUT', 'PATCH']:
             return CompanyEditSerializer
-              
+
         if self.action == 'list':
             return SimpleCompanySerializer
         if self.action == 'retrieve':
             return CompanySerializer
         return CompanySerializer
-    
+
     def get_serializer_context(self):
-        return {'user_id': self.request.user.id}
+        context = super().get_serializer_context()
+        if getattr(self.request.user, 'is_employer', False):
+            context.update({'employer_id': self.request.user.employer.id})
+        return context
 
 
 class NestedJobViewSet(ModelViewSet):
@@ -89,10 +93,10 @@ class NestedJobViewSet(ModelViewSet):
         if self.action == 'retrieve':
             return JobSerializer
         return JobSerializer
-    
+
     def get_serializer_context(self):
         return {'company_id': self.kwargs['company_pk']}
-    
+
 
 class ApplicantsViewSet(ReadOnlyModelViewSet):
 
@@ -115,7 +119,7 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
         if self.action == 'me':
             return EmployeeEditSerializer
         return PublicEmployeeSerializer
-    
+
     @action(detail=False, methods=['get', 'put', 'patch'], permission_classes=[IsAuthenticated, IsEmployee])
     def me(self, request):
         employee_profile = get_object_or_404(Employee, user_id=request.user.id)

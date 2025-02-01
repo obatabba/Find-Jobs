@@ -103,7 +103,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Company.objects.create(
-            manager_id=self.context['user_id'],
+            manager_id=self.context['employer_id'],
             **validated_data
         )
 
@@ -169,7 +169,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
 
 class ApplicationCreateSerializer(serializers.ModelSerializer):
-    
+
     def create(self, validated_data):
         instance = Application.objects.create(
             applicant_id=self.context['applicant_id'],
@@ -177,7 +177,7 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return instance
-        
+
     class Meta:
         model = Application
         fields = ['request_text', 'resume']
