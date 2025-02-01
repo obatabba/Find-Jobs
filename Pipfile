@@ -11,6 +11,7 @@ python-magic = "*"
 python-magic-bin = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 
