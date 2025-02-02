@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework import status
 
 from .models import Application, Company, Employee, Job
 from .serializers import *
-from .permissions import IsCompanyManager, IsEmployee, IsEmployer, IsEmployerOrReadOnly
+from .permissions import IsEmployee, IsEmployer, IsEmployerOrReadOnly, IsTheManager
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -60,7 +60,7 @@ class JobViewSet(ReadOnlyModelViewSet):
 
 class CompanyViewSet(ModelViewSet):
     queryset = Company.objects.all()
-    permission_classes = [IsEmployerOrReadOnly, IsCompanyManager]
+    permission_classes = [IsEmployerOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -82,6 +82,7 @@ class CompanyViewSet(ModelViewSet):
 
 
 class NestedJobViewSet(ModelViewSet):
+    permission_classes = [IsTheManager]
 
     def get_queryset(self):
         return Job.objects.filter(company_id=self.kwargs['company_pk'])
