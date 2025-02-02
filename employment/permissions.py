@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
-from employment.models import Company
+from employment.models import Company, Job
 
 
 class IsEmployee(BasePermission):
@@ -63,3 +63,17 @@ class IsTheManager(BasePermission):
             request.user.is_employer and 
             request.user.employer == obj.company.manager
         )
+
+
+class IsJobOwner(BasePermission):
+
+    def has_permission(self, request, view):
+        if not IsEmployer().has_permission(request, view):
+            return False
+
+        job_id = view.kwargs.get('job_pk')
+        if not job_id:
+            return False
+        
+        job = Job.objects.select_related('company').get(pk=job_id)
+        return request.user.employer == job.company.manager

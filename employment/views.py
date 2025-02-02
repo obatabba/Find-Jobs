@@ -7,7 +7,7 @@ from rest_framework import status
 
 from .models import Application, Company, Employee, Job
 from .serializers import *
-from .permissions import IsEmployee, IsEmployer, IsEmployerOrReadOnly, IsTheManager
+from .permissions import IsEmployee, IsEmployer, IsEmployerOrReadOnly, IsJobOwner, IsTheManager
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -101,6 +101,7 @@ class NestedJobViewSet(ModelViewSet):
 
 
 class ApplicantsViewSet(ReadOnlyModelViewSet):
+    permission_classes = [IsJobOwner | IsAdminUser]
 
     def get_queryset(self):
         return Application.objects.filter(job_id=self.kwargs['job_pk'])
