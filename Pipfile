@@ -15,8 +15,9 @@ dj-database-url = "*"
 
 [dev-packages]
 
-[linux]
+[unix]
 gunicorn = "*"
+psycopg2-binary = "*"
 
 [windows]
 python-magic-bin = "*"
