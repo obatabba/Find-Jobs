@@ -6,18 +6,18 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
-drf-nested-routers = "*"
-python-magic = "*"
-djoser = "*"
 djangorestframework-simplejwt = "*"
 django-debug-toolbar = "*"
+djoser = "*"
 dj-database-url = "*"
+drf-nested-routers = "*"
+psycopg2-binary = "*"
+python-magic = "*"
 
 [dev-packages]
 
 [unix]
 gunicorn = "*"
-psycopg2-binary = "*"
 
 [windows]
 python-magic-bin = "*"
