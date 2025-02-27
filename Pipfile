@@ -8,15 +8,19 @@ django = "*"
 djangorestframework = "*"
 drf-nested-routers = "*"
 python-magic = "*"
-python-magic-bin = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
 django-debug-toolbar = "*"
 dj-database-url = "*"
-gunicorn = "*"
-waitress = "*"
 
 [dev-packages]
+
+[linux]
+gunicorn = "*"
+
+[windows]
+python-magic-bin = "*"
+waitress = "*"
 
 [requires]
 python_version = "3.13"
