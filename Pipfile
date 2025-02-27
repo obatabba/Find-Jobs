@@ -7,14 +7,15 @@ name = "pypi"
 django = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
-django-debug-toolbar = "*"
 djoser = "*"
 dj-database-url = "*"
 drf-nested-routers = "*"
 psycopg2-binary = "*"
 python-magic = "*"
+whitenoise = "*"
 
 [dev-packages]
+django-debug-toolbar = "*"
 
 [unix]
 gunicorn = "*"
