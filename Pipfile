@@ -12,6 +12,9 @@ python-magic-bin = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
 django-debug-toolbar = "*"
+dj-database-url = "*"
+gunicorn = "*"
+waitress = "*"
 
 [dev-packages]
 
