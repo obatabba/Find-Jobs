@@ -1,4 +1,3 @@
-from rest_framework_nested import routers
 from rest_framework_nested.routers import NestedDefaultRouter, DefaultRouter
 from .import views
 
