@@ -13,7 +13,7 @@ dj-database-url = "*"
 drf-nested-routers = "*"
 psycopg2-binary = "*"
 python-magic = "*"
-whitenoise = "*"
+whitenoise = {extras = ["brotli"], version = "*"}
 
 [dev-packages]
 
