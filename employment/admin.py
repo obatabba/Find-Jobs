@@ -4,6 +4,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.db.models import Count
 from django.forms import ModelMultipleChoiceField
 from django.utils.timezone import localdate
+from django.utils.html import format_html
 
 from admin_extend.extend import add_bidirectional_m2m, extend_registered, registered_form
 from .models import Company, Employee, Employer, Job, User
@@ -83,6 +84,15 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_per_page = 20
     ordering = ['user__first_name', 'user__last_name']
     search_fields = ['user__first_name', 'user__last_name']
+    readonly_fields = ['profile_pic']
+
+    def profile_pic(self, instance):
+        return format_html(f'<img src="{instance.profile_picture.url}" class="thumbnail">')
+    
+    class Media:
+        css = {
+            'all': ['employment/styles.css']
+        }
 
 
 @extend_registered

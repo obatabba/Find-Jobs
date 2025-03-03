@@ -22,16 +22,16 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name', 'account_type']
 
 
-class EmployeeEditSerializer(serializers.ModelSerializer):
+class EmployeeEditSerializer(serializers.ModelSerializer): # edit user's employee profile
     first_name = serializers.CharField(source='user.first_name', required=False)
     last_name = serializers.CharField(source='user.last_name', required=False)
     email = serializers.EmailField(source='user.email', required=False)
     expertise = serializers.CharField(required=False)
-    address = AddressSerializer(required=False)
+    address = AddressSerializer(required=False, allow_null=True)
 
     class Meta:
         model = Employee
-        fields = ['first_name', 'last_name', 'email', 'expertise', 'about', 'phone', 'birth_date', 'address']
+        fields = ['first_name', 'last_name', 'profile_picture', 'email', 'expertise', 'about', 'phone', 'birth_date', 'address']
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
@@ -123,7 +123,7 @@ class PublicSimpleEmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'user', 'expertise']
+        fields = ['id', 'user', 'profile_picture', 'expertise']
 
 
 class PublicEmployeeSerializer(serializers.ModelSerializer):
@@ -131,7 +131,7 @@ class PublicEmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['user', 'expertise', 'about']
+        fields = ['user', 'profile_picture', 'expertise', 'about']
 
 
 class SimpleEmployeeSerializer(serializers.ModelSerializer):

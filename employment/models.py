@@ -95,8 +95,13 @@ class Employee(models.Model):
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     joined_in = models.DateField(auto_now_add=True)
-    applied_jobs = models.ManyToManyField(Job, through='Application', blank=True, related_name='applicants')
-    # resume = models.FileField(upload_to='employment/resumes', null=True, blank=True)
+    applied_jobs = models.ManyToManyField(
+        Job, through='Application', blank=True, related_name='applicants')
+    profile_picture = models.ImageField(
+        upload_to='users/profile_pics',
+        validators=[validate_file_size],
+        null=True, blank=True
+    )
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'

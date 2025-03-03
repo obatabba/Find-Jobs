@@ -14,6 +14,7 @@ drf-nested-routers = "*"
 psycopg2-binary = "*"
 python-magic = "*"
 whitenoise = {extras = ["brotli"], version = "*"}
+pillow = "*"
 
 [dev-packages]
 

@@ -127,7 +127,7 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
     def me(self, request):
         employee_profile = get_object_or_404(Employee, user_id=request.user.id)
         if request.method == 'GET':
-            serializer = EmployeeEditSerializer(employee_profile)
+            serializer = EmployeeEditSerializer(employee_profile, context={'request': request})
             return Response(serializer.data)
         if request.method in ['PUT', 'PATCH']:
             serializer = EmployeeEditSerializer(employee_profile, data=request.data)
