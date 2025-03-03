@@ -63,15 +63,8 @@ class CompanyViewSet(ModelViewSet):
     permission_classes = [IsEmployerOrReadOnly]
 
     def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return CompanyCreateSerializer
-        if self.request.method in ['PUT', 'PATCH']:
-            return CompanyEditSerializer
-
         if self.action == 'list':
             return SimpleCompanySerializer
-        if self.action == 'retrieve':
-            return CompanySerializer
         return CompanySerializer
 
     def get_serializer_context(self):

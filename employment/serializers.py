@@ -86,20 +86,14 @@ class JobEditSerializer(serializers.ModelSerializer):
 
 
 class SimpleCompanySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Company
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'logo']
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    manager = serializers.StringRelatedField()
-
-    class Meta:
-        model = Company
-        fields = ['id', 'name', 'manager', 'info']
-
-
-class CompanyCreateSerializer(serializers.ModelSerializer):
+    manager = serializers.StringRelatedField(read_only=True)
 
     def create(self, validated_data):
         return Company.objects.create(
@@ -109,13 +103,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ['name', 'info']
-
-
-class CompanyEditSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Company
-        fields = ['name', 'info']
+        fields = ['id', 'name', 'logo', 'manager', 'info']
 
 
 class PublicSimpleEmployeeSerializer(serializers.ModelSerializer):

@@ -50,6 +50,12 @@ class Company(models.Model):
     manager = models.ForeignKey(Employer, on_delete=models.CASCADE, related_name='companies')
     name = models.CharField(max_length=255, unique=True)
     info =models.TextField()
+    logo = models.ImageField(
+        upload_to='companies/logo',
+        validators=[validate_file_size],
+        null=True, blank=True
+    )
+
 
     def __str__(self):
         return self.name

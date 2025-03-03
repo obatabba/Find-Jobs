@@ -143,6 +143,15 @@ class CompanyAdmin(admin.ModelAdmin):
     list_display = ['name', 'manager', 'jobs_count']
     list_per_page = 20
     ordering = ['name']
+    readonly_fields = ['_logo']
+
+    def _logo(self, instance):
+        return format_html(f'<img src="{instance.logo.url}" class="thumbnail">')
+    
+    class Media:
+        css = {
+            'all': ['employment/styles.css']
+        }
 
     def get_queryset(self, request):
         return super().get_queryset(request) \
