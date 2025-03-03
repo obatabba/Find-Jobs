@@ -58,14 +58,16 @@ class BasicJobSerializer(serializers.ModelSerializer):
 
 class SimpleJobSerializer(serializers.ModelSerializer):
     company = serializers.StringRelatedField()
+    logo = serializers.ImageField(source='company.logo')
 
     class Meta:
         model = Job
-        fields = ['id', 'title', 'company']
+        fields = ['id', 'title', 'company', 'logo']
 
 
 class JobSerializer(serializers.ModelSerializer):
     company = serializers.StringRelatedField()
+    logo = serializers.ImageField(source='company.logo')
 
     def create(self, validated_data):
         instance = Job.objects.create(
@@ -76,7 +78,7 @@ class JobSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Job
-        fields = ['id', 'company', 'title', 'description', 'work_days', 'work_hours', 'salary', 'payment_frequency', 'added', 'expire']
+        fields = ['id', 'company', 'logo', 'title', 'description', 'work_days', 'work_hours', 'salary', 'payment_frequency', 'added', 'expire']
 
 
 class JobEditSerializer(serializers.ModelSerializer):
