@@ -11,7 +11,7 @@ from .permissions import IsEmployee, IsEmployer, IsEmployerOrReadOnly, IsJobOwne
 
 
 class JobViewSet(ReadOnlyModelViewSet):
-    queryset = Job.objects.all()
+    queryset = Job.objects.select_related('company')
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -59,7 +59,7 @@ class JobViewSet(ReadOnlyModelViewSet):
 
 
 class CompanyViewSet(ModelViewSet):
-    queryset = Company.objects.all()
+    queryset = Company.objects.select_related('manager__user')
     permission_classes = [IsEmployerOrReadOnly]
 
     def get_serializer_class(self):
@@ -78,7 +78,7 @@ class NestedJobViewSet(ModelViewSet):
     permission_classes = [IsTheManager]
 
     def get_queryset(self):
-        return Job.objects.filter(company_id=self.kwargs['company_pk'])
+        return Job.objects.filter(company_id=self.kwargs['company_pk']).select_related('company__manager')
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -97,7 +97,7 @@ class ApplicantsViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsJobOwner | IsAdminUser]
 
     def get_queryset(self):
-        return Application.objects.filter(job_id=self.kwargs['job_pk'])
+        return Application.objects.filter(job_id=self.kwargs['job_pk']).select_related('applicant__address', 'applicant__user')
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -106,7 +106,7 @@ class ApplicantsViewSet(ReadOnlyModelViewSet):
 
 
 class EmployeeViewSet(ReadOnlyModelViewSet):
-    queryset = Employee.objects.all()
+    queryset = Employee.objects.select_related('user')
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
@@ -130,7 +130,7 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
 
 
 class EmployerViewSet(ReadOnlyModelViewSet):
-    queryset = Employer.objects.all()
+    queryset = Employer.objects.select_related('user')
     permission_classes = [IsAdminUser]
 
     def get_serializer_class(self):

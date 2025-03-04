@@ -75,5 +75,5 @@ class IsJobOwner(BasePermission):
         if not job_id:
             return False
         
-        job = Job.objects.select_related('company').get(pk=job_id)
-        return request.user.employer == job.company.manager
+        job = Job.objects.select_related('company').values('company__manager').get(pk=job_id)
+        return request.user.employer.id == job['company__manager']

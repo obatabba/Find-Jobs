@@ -70,6 +70,7 @@ class EmployerAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request) \
+            .select_related('user') \
             .annotate(companies_count=Count('companies'))
 
     @admin.display(ordering='companies_count')
@@ -88,6 +89,10 @@ class EmployeeAdmin(admin.ModelAdmin):
 
     def profile_pic(self, instance):
         return format_html(f'<img src="{instance.profile_picture.url}" class="thumbnail">')
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request) \
+            .select_related('user')
     
     class Media:
         css = {
