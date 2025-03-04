@@ -70,6 +70,9 @@ class JobViewSet(ReadOnlyModelViewSet):
 class CompanyViewSet(ModelViewSet):
     queryset = Company.objects.select_related('manager__user')
     permission_classes = [IsEmployerOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name']
+    ordering = ['name']
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -117,6 +120,9 @@ class ApplicantsViewSet(ReadOnlyModelViewSet):
 class EmployeeViewSet(ReadOnlyModelViewSet):
     queryset = Employee.objects.select_related('user')
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['user__first_name', 'user__last_name', 'expertise']
+    ordering = ['user__first_name', 'user__last_name']
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -141,6 +147,9 @@ class EmployeeViewSet(ReadOnlyModelViewSet):
 class EmployerViewSet(ReadOnlyModelViewSet):
     queryset = Employer.objects.select_related('user')
     permission_classes = [IsAdminUser]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['user__first_name', 'user__last_name']
+    ordering = ['user__first_name', 'user__last_name']
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
