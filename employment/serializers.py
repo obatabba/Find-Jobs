@@ -62,7 +62,7 @@ class SimpleJobSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Job
-        fields = ['id', 'title', 'company', 'logo']
+        fields = ['id', 'title', 'company', 'logo', 'salary']
 
 
 class JobSerializer(serializers.ModelSerializer):

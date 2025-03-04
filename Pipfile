@@ -15,6 +15,7 @@ psycopg2-binary = "*"
 python-magic = "*"
 whitenoise = {extras = ["brotli"], version = "*"}
 pillow = "*"
+django-filter = "*"
 
 [dev-packages]
 

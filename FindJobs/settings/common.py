@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'rest_framework',
     'djoser',
+    'django_filters',
     'employment',
     'admin_extend',
 ]

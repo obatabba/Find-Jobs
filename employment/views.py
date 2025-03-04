@@ -1,9 +1,13 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework import filters
 from rest_framework import status
+
+from employment.filters import JobFilter
 
 from .models import Application, Company, Employee, Job
 from .serializers import *
@@ -12,6 +16,11 @@ from .permissions import IsEmployee, IsEmployer, IsEmployerOrReadOnly, IsJobOwne
 
 class JobViewSet(ReadOnlyModelViewSet):
     queryset = Job.objects.select_related('company')
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    filterset_class = JobFilter
+    search_fields = ['title']
+    ordering_fields = ['salary', 'work_days', 'work_hours']
+    ordering = ['-added']
 
     def get_serializer_class(self):
         if self.action == 'list':
