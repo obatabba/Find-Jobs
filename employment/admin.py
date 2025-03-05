@@ -7,7 +7,7 @@ from django.utils.timezone import localdate
 from django.utils.html import format_html
 
 from admin_extend.extend import add_bidirectional_m2m, extend_registered, registered_form
-from .models import Company, Employee, Employer, Job, User
+from .models import Company, Employee, Employer, Job, Tag, User
 
 
 class CompanyInline(admin.TabularInline):
@@ -133,8 +133,8 @@ class JobFilter(admin.SimpleListFilter):
 
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
-    autocomplete_fields = ['company']
-    search_fields = ['title']
+    autocomplete_fields = ['company', 'tags']
+    search_fields = ['title', 'tags__label']
     list_display = ['title', 'company', 'salary', 'expire']
     list_per_page = 20
     ordering = ['added']
@@ -165,3 +165,9 @@ class CompanyAdmin(admin.ModelAdmin):
     @admin.display(ordering='jobs_count')
     def jobs_count(self, company):
         return company.jobs_count
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    search_fields = ['label']
+    ordering = ['label']

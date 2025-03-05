@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -35,6 +35,13 @@ class Address(models.Model):
 
     def __str__(self):
         return f'{self.street} - {self.city}, {self.country}'
+    
+
+class Tag(models.Model):
+    label = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.label
 
 
 class Employer(models.Model):
@@ -88,6 +95,7 @@ class Job(models.Model):
         validators=[MinValueValidator(Decimal(1))]
     )
     payment_frequency = models.CharField(max_length=1, choices=PAYMENT_FREQUENCY_CHOICES,default='M')
+    tags = models.ManyToManyField(Tag, related_name='jobs')
 
     def __str__(self):
         return self.title
