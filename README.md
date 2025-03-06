@@ -25,7 +25,7 @@ Find-Jobs is a hiring platform built with Django and Django REST Framework. It p
 ### Technologies Used
 - **Backend:** Django, Django REST Framework
 - **Environment Management:** Pipenv
-- **Database:** SQLtie
+- **Database:** SQLtie/PostgreSQL
 ### Getting Started
 #### Prerequisites
 - Python 3.x installed
