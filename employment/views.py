@@ -18,7 +18,7 @@ class JobViewSet(ReadOnlyModelViewSet):
     queryset = Job.objects.select_related('company')
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     filterset_class = JobFilter
-    search_fields = ['title']
+    search_fields = ['title', 'tags__label']
     ordering_fields = ['salary', 'work_days', 'work_hours']
     ordering = ['-added']
 
@@ -93,7 +93,7 @@ class NestedJobViewSet(ModelViewSet):
         return Job.objects.filter(company_id=self.kwargs['company_pk']).select_related('company__manager')
 
     def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
+        if self.request.method in ['PUT', 'PATCH', 'POST']:
             return JobEditSerializer
         if self.action == 'list':
             return BasicJobSerializer

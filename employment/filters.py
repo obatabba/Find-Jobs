@@ -8,4 +8,4 @@ class JobFilter(filters.FilterSet):
 
     class Meta:
         model = Job
-        fields = ['company']
+        fields = ['company', 'tags']

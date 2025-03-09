@@ -68,23 +68,27 @@ class SimpleJobSerializer(serializers.ModelSerializer):
 class JobSerializer(serializers.ModelSerializer):
     company = serializers.StringRelatedField()
     logo = serializers.ImageField(source='company.logo')
+    tags = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = Job
+        fields = ['id', 'company', 'logo', 'title', 'description', 'work_days', 'work_hours', 'salary', 'payment_frequency', 'added', 'expire', 'tags']
+
+
+class JobEditSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
+        tags = validated_data.pop('tags')
         instance = Job.objects.create(
             company_id=self.context['company_id'],
             **validated_data
         )
+        instance.tags.set(tags)
         return instance
 
     class Meta:
         model = Job
-        fields = ['id', 'company', 'logo', 'title', 'description', 'work_days', 'work_hours', 'salary', 'payment_frequency', 'added', 'expire']
-
-
-class JobEditSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Job
-        fields = ['title', 'description', 'work_days', 'work_hours', 'salary', 'payment_frequency', 'expire']
+        fields = ['title', 'description', 'tags', 'work_days', 'work_hours', 'salary', 'payment_frequency', 'expire']
 
 
 class SimpleCompanySerializer(serializers.ModelSerializer):
