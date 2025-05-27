@@ -8,8 +8,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
 
-CSRF_TRUSTED_ORIGINS = CSRF_ALLOWED_ORIGINS = CORS_ORIGINS_WHITELIST = [os.environ['HOST_URL']]
-
 DATABASES = {
     'default': dj_database_url.parse(os.environ['DATABASE_URL'])
 }
