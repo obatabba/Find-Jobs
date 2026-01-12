@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-
 set -o errexit
 
-pipenv install --categories "packages unix"
+pip install --upgrade pip
+pip install -r requirements.txt
 
-python3 manage.py collectstatic --no-input
-
-python3 manage.py migrate
-
-# python3 manage.py createsuperuser --noinput
+python manage.py collectstatic --no-input
+python manage.py migrate
