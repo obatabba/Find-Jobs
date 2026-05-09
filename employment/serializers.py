@@ -166,8 +166,8 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instance = Application.objects.create(
-            applicant_id=self.context['applicant_id'],
-            job_id=self.context['job_id'],
+            applicant=self.context['applicant'],
+            job=self.context['job'],
             **validated_data
         )
         return instance
