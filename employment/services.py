@@ -7,15 +7,17 @@ from .serializers import ApplicationCreateSerializer
 class ApplicationService:
     
     @staticmethod
-    def check_application_existence(*, applicant: Employee, job: Job) -> bool:
-        return Application.objects.filter(
+    def get_application(*, applicant: Employee, job: Job) -> Application | None:
+        application = Application.objects.filter(
             applicant=applicant,
             job=job
-        ).exists()
+        ).first()
+
+        return application
 
     @staticmethod
-    def apply(*, applicant: Employee, job: Job, data):
-        if ApplicationService.check_application_existence(
+    def apply(*, applicant: Employee, job: Job, data) -> Application | None:
+        if ApplicationService.get_application(
             applicant=applicant,
             job=job
         ):
@@ -31,3 +33,15 @@ class ApplicationService:
         )
 
         return application
+    
+    @staticmethod
+    def cancel_application(*, applicant: Employee, job: Job) -> None:
+        application = ApplicationService.get_application(
+            applicant=applicant,
+            job=job
+        )
+        
+        if not application:
+            raise ValidationError("You have not applied to this job.")
+        
+        application.delete()

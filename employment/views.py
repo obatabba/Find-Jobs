@@ -51,15 +51,15 @@ class JobViewSet(ReadOnlyModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[IsEmployee])
     def cancel_application(self, request, pk):
-        employee = Employee.objects.get(user_id=request.user.id)
+        employee = request.user.employee
         job = get_object_or_404(Job, pk=pk)
-        application = Application.objects.filter(applicant=employee, job=job)
-        if application.exists():
-            application.delete()
-            return Response(
-                {"success": "Your application has been canceled successfully."})
 
-        return Response({"error": "You have not applied to this job."}, status=status.HTTP_400_BAD_REQUEST)
+        ApplicationService.cancel_application(applicant=employee, job=job)
+
+        return Response(
+            {"success": "Your application has been canceled successfully."},
+            status=status.HTTP_200_OK
+        )
 
 
 class CompanyViewSet(ModelViewSet):
