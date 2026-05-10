@@ -103,7 +103,7 @@ class CompanySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Company.objects.create(
-            manager_id=self.context['employer_id'],
+            manager=self.context['employer'],
             **validated_data
         )
 

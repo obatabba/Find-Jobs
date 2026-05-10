@@ -77,7 +77,7 @@ class CompanyViewSet(ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         if getattr(self.request.user, 'is_employer', False):
-            context.update({'employer_id': self.request.user.employer.id})
+            context.update({'employer': self.request.user.employer})
         return context
 
 
