@@ -164,14 +164,6 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
 class ApplicationCreateSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        instance = Application.objects.create(
-            applicant=self.context['applicant'],
-            job=self.context['job'],
-            **validated_data
-        )
-        return instance
-
     class Meta:
         model = Application
         fields = ['request_text', 'resume']
