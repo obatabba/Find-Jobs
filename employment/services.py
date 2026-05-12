@@ -1,7 +1,7 @@
 from rest_framework.exceptions import ValidationError
 
 from .models import Application, Employee, Job
-from .serializers import ApplicationCreateSerializer
+from .serializers import ApplicationSerializer
 
 
 class ApplicationService:
@@ -23,7 +23,7 @@ class ApplicationService:
         ):
             raise ValidationError("You have already applied to this job")
     
-        serializer = ApplicationCreateSerializer(data=data, context={'applicant': applicant, 'job': job})
+        serializer = ApplicationSerializer(data=data, context={'applicant': applicant, 'job': job})
         serializer.is_valid(raise_exception=True)
         
         application = Application.objects.create(

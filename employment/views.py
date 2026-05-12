@@ -29,7 +29,7 @@ class JobViewSet(ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return JobSerializer
         if self.action == 'apply':
-            return ApplicationCreateSerializer
+            return ApplicationSerializer
         return EmptySerializer
 
     @action(detail=True, methods=['post'], permission_classes=[IsEmployee])

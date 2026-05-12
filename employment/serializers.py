@@ -155,18 +155,11 @@ class SimpleApplicationSerializer(serializers.ModelSerializer):
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
-    applicant = EmployeeSerializer()
+    applicant = EmployeeSerializer(read_only=True)
 
     class Meta:
         model = Application
         fields = ['id', 'applicant', 'request_text', 'resume', 'applied_at']
-
-
-class ApplicationCreateSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Application
-        fields = ['request_text', 'resume']
 
 
 class EmptySerializer(serializers.Serializer):
