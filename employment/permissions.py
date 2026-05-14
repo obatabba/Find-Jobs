@@ -18,13 +18,13 @@ class IsEmployer(BasePermission):
         return getattr(request.user, 'is_employer', False)
     
 
-class IsEmployerOrReadOnly(BasePermission):
-    """Allows only employers to create companies, update and delete only their companies. Read access is open to everyone."""
+class IsEmployerAndOwnerOrReadOnly(BasePermission):
+    """Allows only employers to create companies, update/delete their own companies only. Read access is open to everyone."""
 
     def has_permission(self, request, view):
-        if request.method == 'POST':
-            return IsEmployer().has_permission(request, view)        
-        return True
+        if request.method in SAFE_METHODS:
+            return True
+        return IsEmployer().has_permission(request, view)        
 
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:

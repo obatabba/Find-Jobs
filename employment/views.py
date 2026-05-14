@@ -11,7 +11,7 @@ from employment.filters import JobFilter
 
 from .models import Application, Company, Employee, Job
 from .serializers import *
-from .permissions import IsEmployee, IsEmployer, IsEmployerOrReadOnly, IsJobOwner, IsTheManager
+from .permissions import IsEmployee, IsEmployer, IsEmployerAndOwnerOrReadOnly, IsJobOwner, IsTheManager
 
 
 class JobViewSet(ReadOnlyModelViewSet):
@@ -69,7 +69,7 @@ class JobViewSet(ReadOnlyModelViewSet):
 
 class CompanyViewSet(ModelViewSet):
     queryset = Company.objects.select_related('manager__user')
-    permission_classes = [IsEmployerOrReadOnly]
+    permission_classes = [IsEmployerAndOwnerOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
     ordering = ['name']
