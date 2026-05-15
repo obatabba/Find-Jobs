@@ -4,7 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .validators import validate_file_content, validate_file_size
+from .validators import validate_file_content, validate_file_size, validate_expire_date
 
 
 class User(AbstractUser):
@@ -63,7 +63,6 @@ class Company(models.Model):
         null=True, blank=True
     )
 
-
     def __str__(self):
         return self.name
     
@@ -86,7 +85,7 @@ class Job(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(24)]
     )
     added = models.DateField(auto_now_add=True, null=True)
-    expire = models.DateField(null=True, blank=True)
+    expire = models.DateField(null=True, blank=True, validators=[validate_expire_date])
     salary = models.DecimalField(
         max_digits=8,
         decimal_places=2,

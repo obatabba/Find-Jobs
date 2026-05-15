@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 import magic
 
 
@@ -16,3 +17,7 @@ def validate_file_content(file):
     if file_mime_type not in allowed_mime_types:
         raise ValidationError("Invalid file type. Only PDF files are allowed.")
     
+
+def validate_expire_date(expiration_date):
+    if expiration_date <= now().date():
+        raise ValidationError("Expiration date must be after today.")
