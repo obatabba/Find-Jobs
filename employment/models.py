@@ -13,7 +13,7 @@ class User(AbstractUser):
         'employee': 'Employee'
     }
 
-    email = models.EmailField(unique=True, blank=True)
+    email = models.EmailField(unique=True)
     account_type = models.CharField(max_length=8, choices=ACCOUNT_TYPE_CHOICES)
 
     def __str__(self):

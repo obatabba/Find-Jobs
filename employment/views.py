@@ -1,16 +1,17 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework import filters
 from rest_framework import status
 
-from employment.filters import JobFilter
-
+from .filters import JobFilter
 from .models import Application, Company, Employee, Job
 from .serializers import *
+from .services import ApplicationService
 from .permissions import IsEmployee, IsEmployer, IsEmployerAndOwnerOrReadOnly, IsJobOwner, IsTheManager
 
 
@@ -28,43 +29,37 @@ class JobViewSet(ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return JobSerializer
         if self.action == 'apply':
-            return ApplicationCreateSerializer
+            return ApplicationSerializer
         return EmptySerializer
-    
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        if self.action == 'apply':
-            context.update({
-                'applicant_id': self.request.user.employee.id,
-                'job_id': self.kwargs['pk']
-            })
-        return context 
 
     @action(detail=True, methods=['post'], permission_classes=[IsEmployee])
     def apply(self, request, pk):
-        employee = Employee.objects.get(user_id=request.user.id)
+
+        employee = request.user.employee
         job = get_object_or_404(Job, pk=pk)
 
-        if Application.objects.filter(applicant=employee, job=job).exists():
-            return Response(
-                {"error":"You have already applied to this job."}, status=status.HTTP_400_BAD_REQUEST)
+        ApplicationService.apply(
+            applicant=employee,
+            job=job,
+            data=request.data
+        )
 
-        serializer = ApplicationCreateSerializer(data=request.data, context=self.get_serializer_context())
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"success": "You have successfully applied to this job."})
+        return Response(
+            {"success": "You have successfully applied to this job."},
+            status=status.HTTP_201_CREATED
+        )
 
     @action(detail=True, methods=['post'], permission_classes=[IsEmployee])
     def cancel_application(self, request, pk):
-        employee = Employee.objects.get(user_id=request.user.id)
+        employee = request.user.employee
         job = get_object_or_404(Job, pk=pk)
-        application = Application.objects.filter(applicant=employee, job=job)
-        if application.exists():
-            application.delete()
-            return Response(
-                {"success": "Your application has been canceled successfully."})
 
-        return Response({"error": "You have not applied to this job."}, status=status.HTTP_400_BAD_REQUEST)
+        ApplicationService.cancel_application(applicant=employee, job=job)
+
+        return Response(
+            {"success": "Your application has been canceled successfully."},
+            status=status.HTTP_200_OK
+        )
 
 
 class CompanyViewSet(ModelViewSet):
@@ -82,7 +77,7 @@ class CompanyViewSet(ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         if getattr(self.request.user, 'is_employer', False):
-            context.update({'employer_id': self.request.user.employer.id})
+            context.update({'employer': self.request.user.employer})
         return context
 
 
